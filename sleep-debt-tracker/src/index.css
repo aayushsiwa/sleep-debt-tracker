@@ -1,0 +1,11 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    font-family: "Nunito", sans-serif;
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: black;
+}
