@@ -4,8 +4,8 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node index.js",
-        "dev": "nodemon index.js"
+        "start": "tsx server.ts",
+        "dev": "nodemon -x tsx server.ts"
     },
     "type": "module",
     "keywords": [],
@@ -13,12 +13,16 @@
     "license": "ISC",
     "description": "",
     "dependencies": {
+        "bcryptjs": "^3.0.2",
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
         "mongoose": "^8.12.2"
     },
     "devDependencies": {
-        "nodemon": "^3.1.9"
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.1",
+        "nodemon": "^3.1.9",
+        "tsx": "^4.19.3"
     }
 }

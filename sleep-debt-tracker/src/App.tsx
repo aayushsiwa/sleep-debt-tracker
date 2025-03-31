@@ -1,85 +1,103 @@
 import { useEffect, useState, useCallback } from "react";
 import Dashboard from "./components/Dashboard";
-import SleepChart from "./components/SleepChart";
-import { getSleepLogs } from "./api.ts";
+import Navbar from "./components/Navbar";
+import { getSleepGoal, getSleepLogs } from "./api";
+
+// Define TypeScript interfaces for sleep data
+interface SleepEntry {
+    date: string;
+    hours: number;
+}
 
 export default function App() {
-    const [sleepData, setSleepData] = useState<
-        { date: string; hours: number }[]
-    >([]);
-    const [sleepDebt, setSleepDebt] = useState(0);
-    const [userId, setUserId] = useState("660fbc9d6f7b4a5c3d0f1234");
-    const idealSleepHours = 8;
+    const [sleepData, setSleepData] = useState<SleepEntry[]>([]);
+    const [sleepDebt, setSleepDebt] = useState<number>(0);
+    const userId = "johndoe"; // Hardcoded for now; replace with dynamic user logic
 
-    const fetchData = useCallback(async () => {
-        if (!userId) return;
-        console.log("Fetching data for userId:", userId);
+    // Fetch sleep data
+    const fetchData = useCallback(
+        async (callback?: (data: SleepEntry[]) => void) => {
+            if (!userId) return;
 
-        const logs = await getSleepLogs(userId);
-        console.log("Fetched raw logs:", logs);
+            try {
+                const [logs, goal] = await Promise.all([
+                    getSleepLogs(userId),
+                    getSleepGoal(userId),
+                ]);
 
-        let totalSleepDebt = 0;
-        const aggregatedData = logs.reduce((acc, log) => {
-            const timestamp = log.startTime * 1000; // Convert to milliseconds
-            const date = new Date(timestamp).toISOString().split("T")[0]; // Force UTC format
-            const hours = log.duration / 60; // Convert minutes to hours
+                if (!Array.isArray(logs) || logs.length === 0) {
+                    console.warn("No sleep logs found for user:", userId);
+                    setSleepData([]);
+                    setSleepDebt(0);
+                    return;
+                }
 
-            console.log(`Processing log:`, {
-                timestamp,
-                formattedDate: date,
-                durationMinutes: log.duration,
-                durationHours: hours,
-            });
+                let totalSleepDebt = 0;
+                const aggregatedData = logs.reduce<Record<string, number>>(
+                    (acc, log) => {
+                        const timestamp = log.startTime * 1000;
+                        const date = new Date(timestamp)
+                            .toISOString()
+                            .split("T")[0];
+                        const hours = log.duration / 60;
 
-            acc[date] = (acc[date] || 0) + hours;
-            return acc;
-        }, {} as Record<string, number>);
+                        if (hours < 0) {
+                            console.warn(
+                                `Skipping invalid entry: ${date} with duration ${hours} hours`
+                            );
+                            return acc;
+                        }
 
-        console.log("Aggregated sleep data:", aggregatedData);
+                        acc[date] = (acc[date] || 0) + hours;
+                        return acc;
+                    },
+                    {}
+                );
+                totalSleepDebt = Object.values(aggregatedData).reduce(
+                    (debt, hours) => debt + goal - hours, // ✅ Use the fetched goal
+                    0
+                );
+                // console log the aggregated data hours
+                // console.log(
+                //     "Aggregated Data:",
+                //     Object.values(aggregatedData).reduce(
+                //         (date, hours) =>
+                //             ` ${date}: ${hours} hours`,
+                //         ""
+                //     )
+                // );
 
-        // Calculate sleep debt
-        totalSleepDebt = Object.values(aggregatedData).reduce(
-            (debt, hours) => debt + Math.max(0, idealSleepHours - hours),
-            0
-        );
+                const newSleepData = Object.entries(aggregatedData).map(
+                    ([date, hours]) => ({
+                        date,
+                        hours,
+                    })
+                );
 
-        setSleepDebt(totalSleepDebt);
-        setSleepData(
-            Object.entries(aggregatedData).map(([date, hours]) => ({
-                date,
-                hours,
-            }))
-        );
+                setSleepDebt(totalSleepDebt);
+                setSleepData(newSleepData);
 
-        console.log(
-            "Final processed sleep data:",
-            Object.entries(aggregatedData).map(([date, hours]) => ({
-                date,
-                hours,
-            }))
-        );
-    }, [userId]);
+                if (callback) callback(newSleepData);
+            } catch (error) {
+                console.error("❌ Error fetching sleep data:", error);
+            }
+        },
+        [userId]
+    );
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
     return (
-        <div className="bg-gray-900 text-white min-h-screen p-6">
-            <h1 className="text-3xl font-bold">NapTrack</h1>
-            <p
-                className={`text-lg font-semibold ${
-                    sleepDebt > 10
-                        ? "text-red-500"
-                        : sleepDebt > 5
-                        ? "text-yellow-500"
-                        : "text-green-400"
-                }`}
-            >
-                Sleep Debt: {sleepDebt.toFixed(1)} hours
-            </p>
-            <Dashboard userId={userId} />
-            <SleepChart data={sleepData} />
+        <div className="bg-gray-900 text-white max-h-screen">
+            <Navbar />
+            <Dashboard
+                userId={userId}
+                refreshData={fetchData}
+                sleepDebt={sleepDebt}
+                sleepData={sleepData}
+            />
         </div>
     );
 }

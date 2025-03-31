@@ -13,7 +13,7 @@ export function calculateSleepDebt(sleepLogs) {
             nextMidnight.setHours(24, 0, 0, 0);
 
             let sleepEnd = end < nextMidnight ? end : nextMidnight;
-            let sleepDuration = (sleepEnd - start) / (1000 * 60); // ms → minutes
+            let sleepDuration = (Number(sleepEnd) - Number(start)) / (1000 * 60); // ms → minutes
 
             dailySleep[currentDay] = (dailySleep[currentDay] || 0) + sleepDuration;
 

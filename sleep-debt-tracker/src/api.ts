@@ -1,58 +1,77 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_API_URL as string;
 
-// Fetch sleep logs
-export const getSleepLogs = async (userId) => {
+// Helper function for error logging
+const handleApiError = (error: unknown, action: string) => {
+    if (axios.isAxiosError(error)) {
+        console.error(`❌ API Error [${action}]:`, error.response?.data || error.message);
+    } else {
+        console.error(`❌ Unexpected Error [${action}]:`, error);
+    }
+};
+
+// ✅ Fetch sleep logs
+export const getSleepLogs = async (userId: string) => {
     try {
         const res = await axios.get(`${API_URL}/${userId}`);
+        if (!Array.isArray(res.data)) {
+            console.warn("⚠️ Unexpected sleep logs response:", res.data);
+            return [];
+        }
         return res.data;
     } catch (error) {
-        console.error("Error fetching sleep logs", error);
-        return [];
+        handleApiError(error, "Fetching sleep logs");
+        return []; // Return an empty array for new users or API failures
     }
 };
 
-// Fetch sleep debt
-export const getSleepDebt = async (userId) => {
+// ✅ Fetch sleep debt
+export const getSleepDebt = async (userId: string) => {
     try {
         const res = await axios.get(`${API_URL}/debt/${userId}`);
-        return res.data;
+        if (!res.data || typeof res.data.sleepDebt !== "number") {
+            console.warn("⚠️ Unexpected sleep debt response:", res.data);
+            return 0; // Default sleep debt to 0
+        }
+        return res.data.sleepDebt;
     } catch (error) {
-        console.error("Error fetching sleep debt", error);
-        return null;
+        handleApiError(error, "Fetching sleep debt");
+        return 0;
     }
 };
 
-// Fetch sleep goal
-export const getSleepGoal = async (userId) => {
+// ✅ Fetch sleep goal
+export const getSleepGoal = async (userId: string) => {
     try {
         const res = await axios.get(`${API_URL}/${userId}/sleep-goal`);
+        if (!res.data || typeof res.data.sleepGoal !== "number") {
+            console.warn("⚠️ Unexpected sleep goal response:", res.data);
+            return 8; // Default goal: 8 hours
+        }
         return res.data.sleepGoal / 60; // Convert minutes to hours
     } catch (error) {
-        console.error("Error fetching sleep goal", error);
-        return null;
+        handleApiError(error, "Fetching sleep goal");
+        return 8;
     }
 };
 
-// Add a new sleep entry
-export const addSleepEntry = async (userId, startTime, endTime) => {
+// ✅ Add a new sleep entry
+export const addSleepEntry = async (userId: string, startTime: number, endTime: number) => {
     try {
         const res = await axios.post(`${API_URL}/add`, { userId, startTime, endTime });
         return res.data;
     } catch (error) {
-        console.error("Error adding sleep entry", error);
+        handleApiError(error, "Adding sleep entry");
         return null;
     }
 };
 
-
-
-// Update sleep goal
-export const updateSleepGoal = async (userId, sleepGoal) => {
+// ✅ Update sleep goal
+export const updateSleepGoal = async (userId: string, sleepGoal: number) => {
     try {
-        await axios.put(`${API_URL}/${userId}/sleep-goal`, { sleepGoal: sleepGoal * 60 }); // Convert hours to minutes
+        await axios.put(`${API_URL}/${userId}/sleep-goal`, { sleepGoal: sleepGoal * 60 }); // Convert to minutes
     } catch (error) {
-        console.error("Error updating sleep goal", error);
+        handleApiError(error, "Updating sleep goal");
     }
 };

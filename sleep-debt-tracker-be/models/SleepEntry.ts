@@ -16,4 +16,6 @@ SleepEntrySchema.pre("save", function (next) {
   next();
 });
 
+SleepEntrySchema.index({ userId: 1, startTime: 1, endTime: 1 }, { unique: true });
+
 export const SleepEntry = mongoose.model("SleepEntry", SleepEntrySchema);
