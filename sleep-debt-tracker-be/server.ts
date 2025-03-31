@@ -18,6 +18,11 @@ app.use(cors({ origin: "*", credentials: true }));
 app.use("/api/sleep", sleepRoutes);
 app.use("/api/users", userRoutes);
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the Sleep Debt Tracker API! 🚀");
+}
+);
+
 async function connectDB() {
   try {
       await mongoose.connect(process.env.MONGO_URI || "", {
