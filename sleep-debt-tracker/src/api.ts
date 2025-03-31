@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL as string;
+const sleepAPI=`${API_URL}/api/sleep`;
 
 // Helper function for error logging
 const handleApiError = (error: unknown, action: string) => {
@@ -14,7 +15,7 @@ const handleApiError = (error: unknown, action: string) => {
 // ✅ Fetch sleep logs
 export const getSleepLogs = async (userId: string) => {
     try {
-        const res = await axios.get(`${API_URL}/${userId}`);
+        const res = await axios.get(`${sleepAPI}/${userId}`);
         if (!Array.isArray(res.data)) {
             console.warn("⚠️ Unexpected sleep logs response:", res.data);
             return [];
@@ -29,7 +30,7 @@ export const getSleepLogs = async (userId: string) => {
 // ✅ Fetch sleep debt
 export const getSleepDebt = async (userId: string) => {
     try {
-        const res = await axios.get(`${API_URL}/debt/${userId}`);
+        const res = await axios.get(`${sleepAPI}/debt/${userId}`);
         if (!res.data || typeof res.data.sleepDebt !== "number") {
             console.warn("⚠️ Unexpected sleep debt response:", res.data);
             return 0; // Default sleep debt to 0
@@ -44,7 +45,7 @@ export const getSleepDebt = async (userId: string) => {
 // ✅ Fetch sleep goal
 export const getSleepGoal = async (userId: string) => {
     try {
-        const res = await axios.get(`${API_URL}/${userId}/sleep-goal`);
+        const res = await axios.get(`${sleepAPI}/${userId}/sleep-goal`);
         if (!res.data || typeof res.data.sleepGoal !== "number") {
             console.warn("⚠️ Unexpected sleep goal response:", res.data);
             return 8; // Default goal: 8 hours
@@ -59,7 +60,7 @@ export const getSleepGoal = async (userId: string) => {
 // ✅ Add a new sleep entry
 export const addSleepEntry = async (userId: string, startTime: number, endTime: number) => {
     try {
-        const res = await axios.post(`${API_URL}/add`, { userId, startTime, endTime });
+        const res = await axios.post(`${sleepAPI}/add`, { userId, startTime, endTime });
         return res.data;
     } catch (error) {
         handleApiError(error, "Adding sleep entry");
@@ -70,7 +71,7 @@ export const addSleepEntry = async (userId: string, startTime: number, endTime: 
 // ✅ Update sleep goal
 export const updateSleepGoal = async (userId: string, sleepGoal: number) => {
     try {
-        await axios.put(`${API_URL}/${userId}/sleep-goal`, { sleepGoal: sleepGoal * 60 }); // Convert to minutes
+        await axios.put(`${sleepAPI}/${userId}/sleep-goal`, { sleepGoal: sleepGoal * 60 }); // Convert to minutes
     } catch (error) {
         handleApiError(error, "Updating sleep goal");
     }
