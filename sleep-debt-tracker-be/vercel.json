@@ -1,7 +1,6 @@
 {
   "version": 2,
   "builds": [],
-  "ignoreCommand": "echo 'Skipping build, using prebuilt dist'",
   "routes": [
     { "src": "/(.*)", "dest": "/dist/server.js" }
   ]
