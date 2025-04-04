@@ -30,7 +30,7 @@ router.post("/add", async (req, res) => {
 
 
 // ✅ Fetch sleep entries by userId
-router.get("/:userId", async (req, res) => {
+router.get("/user/:userId/sleepLogs", async (req, res) => {
   try {
       const sleepEntries = await SleepEntry.find({ userId: req.params.userId }).sort({ startTime: -1 });
 
@@ -50,7 +50,7 @@ router.get("/:userId", async (req, res) => {
 
 
 // ✅ Fetch sleep debt per day for the past 7 days
-router.get("/debt/:userId", async (req, res) => {
+router.get("/user/:userId/debt", async (req, res) => {
   try {
       const { userId } = req.params;
       const user = await User.findOne({ userId });
@@ -79,7 +79,7 @@ router.get("/debt/:userId", async (req, res) => {
 
 
 // ✅ Update user's sleep goal
-router.put("/:userId/sleep-goal", async (req, res) => {
+router.put("/user/:userId/sleepGoal", async (req, res) => {
     try {
         const user = await User.findOneAndUpdate(
             { userId: req.params.userId },
@@ -97,7 +97,7 @@ router.put("/:userId/sleep-goal", async (req, res) => {
 });
 
 // ✅ Fetch user's sleep goal
-router.get("/:userId/sleep-goal", async (req, res) => {
+router.get("/user/:userId/sleepGoal", async (req, res) => {
     try {
         const user = await User.findOne({ userId: req.params.userId });
         if (!user) return res.status(404).json({ message: "User not found" });

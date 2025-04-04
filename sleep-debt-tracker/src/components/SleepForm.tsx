@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { addSleepEntry } from "../api";
+import { addSleepEntry } from "../api/sleep";
 import { Plus, Moon, SunMedium, X, Save } from "lucide-react";
 
 interface SleepFormProps {
@@ -18,10 +18,8 @@ export default function SleepForm({ userId, onSuccess }: SleepFormProps) {
 
   useEffect(() => {
     validateAndCalculateDuration();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [startTime, endTime]);
 
-  /** Get default sleep times */
   function getDefaultStartTime() {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
@@ -35,11 +33,10 @@ export default function SleepForm({ userId, onSuccess }: SleepFormProps) {
     return formatDateTime(today);
   }
 
-  function formatDateTime(date:Date) {
-    return date.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+  function formatDateTime(date: Date) {
+    return date.toISOString().slice(0, 16);
   }
 
-  /** Validates and calculates sleep duration */
   function validateAndCalculateDuration() {
     const start = new Date(startTime);
     const end = new Date(endTime);
@@ -61,20 +58,19 @@ export default function SleepForm({ userId, onSuccess }: SleepFormProps) {
     }
 
     setDuration({ hours: diffHours, minutes: diffMinutes });
-    setError(""); // Clear previous errors
+    setError("");
   }
 
-  /**  Handles sleep entry submission */
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!userId) return alert("User ID missing");
-    if (error) return; // Prevent submission if invalid duration
+    if (error) return;
 
     try {
       setIsSubmitting(true);
       await addSleepEntry(
-        userId, 
-        Date.parse(startTime), 
+        userId,
+        Date.parse(startTime),
         Date.parse(endTime)
       );
       if (modalRef.current) {
@@ -91,96 +87,91 @@ export default function SleepForm({ userId, onSuccess }: SleepFormProps) {
 
   return (
     <div className="fixed bottom-8 right-8 z-10">
-      <button 
-        className="bg-indigo-600 hover:bg-indigo-500 text-white p-4 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105"
+      <button
+        className="bg-primary hover:bg-accent text-text p-4 rounded-full shadow-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105"
         onClick={() => modalRef.current?.showModal()}
         aria-label="Add sleep entry"
       >
         <Plus size={24} />
       </button>
-      
-      <dialog 
-        ref={modalRef} 
-        className="bg-slate-900 text-white p-0 rounded-xl shadow-2xl border border-slate-700 backdrop:bg-slate-900/80 w-full max-w-md"
+
+      <dialog
+        ref={modalRef}
+        className="bg-background text-text p-0 rounded-xl shadow-2xl border border-primary backdrop:bg-secondary/80 w-full max-w-md"
       >
         <div className="flex flex-col">
-          <div className="bg-slate-800 p-5 flex items-center justify-between rounded-t-xl">
+          <div className="bg-secondary bg-opacity-20 p-5 flex items-center justify-between rounded-t-xl">
             <div className="flex items-center gap-3">
-              <Moon className="text-indigo-400" size={20} />
+              <Moon className="text-accent" size={20} />
               <h2 className="text-xl font-semibold">Add Sleep Entry</h2>
             </div>
-            <button 
-              type="button" 
-              className="text-slate-400 hover:text-white transition-colors p-1 rounded-full hover:bg-slate-700"
+            <button
+              type="button"
+              className="text-secondary hover:text-text transition-colors p-1 rounded-full hover:bg-primary/20"
               onClick={() => modalRef.current?.close()}
               aria-label="Close dialog"
             >
               <X size={20} />
             </button>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="p-5 space-y-5">
-            {/* Error message */}
             {error && (
-              <div className="bg-red-700 text-white text-sm p-3 rounded-lg">
+              <div className="bg-accent/20 text-accent text-sm p-3 rounded-lg">
                 {error}
               </div>
             )}
 
             <div className="space-y-4">
-              {/* 🛏️ Bedtime Input */}
               <div className="space-y-2">
-                <label htmlFor="start-time" className="text-slate-300 font-medium flex items-center gap-2">
-                  <Moon size={16} className="text-indigo-400" />
+                <label htmlFor="start-time" className="text-secondary font-medium flex items-center gap-2">
+                  <Moon size={16} className="text-accent" />
                   Bedtime
                 </label>
-                <input 
+                <input
                   id="start-time"
-                  type="datetime-local" 
-                  className="w-full bg-slate-800 p-3 rounded-lg text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={startTime} 
+                  type="datetime-local"
+                  className="w-full bg-secondary bg-opacity-20 p-3 rounded-lg text-text border border-primary focus:outline-none focus:ring-2 focus:ring-accent"
+                  value={startTime}
                   onChange={(e) => setStartTime(e.target.value)}
                   autoFocus
-                  required 
+                  required
                 />
               </div>
-              
-              {/* ☀️ Wake-up Time Input */}
+
               <div className="space-y-2">
-                <label htmlFor="end-time" className="text-slate-300 font-medium flex items-center gap-2">
-                  <SunMedium size={16} className="text-amber-400" />
+                <label htmlFor="end-time" className="text-secondary font-medium flex items-center gap-2">
+                  <SunMedium size={16} className="text-accent" />
                   Wake-up Time
                 </label>
-                <input 
+                <input
                   id="end-time"
-                  type="datetime-local" 
-                  className="w-full bg-slate-800 p-3 rounded-lg text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  value={endTime} 
-                  onChange={(e) => setEndTime(e.target.value)} 
-                  required 
+                  type="datetime-local"
+                  className="w-full bg-secondary bg-opacity-20 p-3 rounded-lg text-text border border-primary focus:outline-none focus:ring-2 focus:ring-accent"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  required
                 />
               </div>
             </div>
-            
-            {/* ⏳ Sleep Duration */}
-            <div className="text-center text-lg font-bold text-indigo-400">
+
+            <div className="text-center text-lg font-bold text-accent">
               {duration.hours}h {duration.minutes}m
-              <div className="text-slate-400 text-sm">Sleep Duration</div>
+              <div className="text-secondary text-sm">Sleep Duration</div>
             </div>
 
-            {/* Buttons */}
             <div className="flex gap-3 pt-2">
-              <button 
-                type="button" 
-                className="flex-1 bg-slate-700 hover:bg-slate-600 px-4 py-3 rounded-lg text-slate-300 transition-colors flex items-center justify-center gap-2"
+              <button
+                type="button"
+                className="flex-1 bg-secondary hover:bg-primary/50 px-4 py-3 rounded-lg text-text transition-colors flex items-center justify-center gap-2"
                 onClick={() => modalRef.current?.close()}
               >
                 <X size={18} />
                 Cancel
               </button>
-              <button 
-                type="submit" 
-                className="flex-1 bg-indigo-600 hover:bg-indigo-500 px-4 py-3 rounded-lg text-white font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:bg-indigo-600"
+              <button
+                type="submit"
+                className="flex-1 bg-primary hover:bg-accent px-4 py-3 rounded-lg text-text font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:bg-primary"
                 disabled={isSubmitting || !!error}
               >
                 <Save size={18} />

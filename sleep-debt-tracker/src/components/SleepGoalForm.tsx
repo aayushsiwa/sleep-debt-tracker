@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Moon, CheckCircle } from "lucide-react";
-import { updateSleepGoal } from "../api";
+import { updateSleepGoal } from "../api/sleep";
 
 interface SleepGoalFormProps {
     userId: string;
@@ -30,11 +30,7 @@ export default function SleepGoalForm({
             await updateSleepGoal(userId, sleepGoal);
             onGoalChange(sleepGoal);
             setIsSaved(true);
-
-            // Reset the saved indicator after 3 seconds
-            setTimeout(() => {
-                setIsSaved(false);
-            }, 3000);
+            setTimeout(() => setIsSaved(false), 3000);
         } catch (error) {
             console.error("Failed to update sleep goal:", error);
             alert("Failed to save sleep goal. Please try again.");
@@ -43,19 +39,16 @@ export default function SleepGoalForm({
         }
     };
 
-    const handleCancel = () => {
-        setSleepGoal(currentGoal ?? 8);
-    };
 
     return (
-        <div className="">
+        <div>
             <div className="flex items-center gap-1 mb-1">
-                <Moon className="text-indigo-400" size={24} />
-                <h2 className="text-xl font-semibold text-white">
+                <Moon className="text-accent" size={24} />
+                <h2 className="text-xl font-semibold text-text">
                     Set Your Sleep Goal
                 </h2>
             </div>
-            <p className="text-slate-300 mb-2">
+            <p className="text-text mb-2">
                 How many hours would you like to sleep each night?
             </p>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -63,23 +56,21 @@ export default function SleepGoalForm({
                     <div className="flex justify-between items-center">
                         <label
                             htmlFor="sleep-hours"
-                            className="text-slate-300 text-sm"
+                            className="text-text text-sm"
                         >
                             Hours per night
                         </label>
                         <div className="flex items-center gap-2">
                             <span
                                 className={`font-medium ${
-                                    isSaved
-                                        ? "text-green-400"
-                                        : "text-indigo-400"
+                                    isSaved ? "text-green-600" : "text-primary"
                                 }`}
                             >
                                 {sleepGoal} {sleepGoal === 1 ? "hour" : "hours"}
                             </span>
                             {isSaved && (
                                 <CheckCircle
-                                    className="text-green-400"
+                                    className="text-green-600"
                                     size={16}
                                 />
                             )}
@@ -89,7 +80,7 @@ export default function SleepGoalForm({
                         <input
                             id="sleep-hours"
                             type="range"
-                            className="w-full accent-indigo-500 bg-slate-700 h-2 rounded-lg appearance-none cursor-pointer"
+                            className="w-full accent-primary bg-primary h-2 rounded-lg appearance-none cursor-pointer"
                             value={sleepGoal}
                             onChange={(e) =>
                                 setSleepGoal(parseFloat(e.target.value))
@@ -99,7 +90,7 @@ export default function SleepGoalForm({
                             step="0.5"
                             required
                         />
-                        <div className="flex justify-between text-xs text-slate-400 mt-1 px-1">
+                        <div className="flex justify-between text-xs text-text mt-1 px-1">
                             <span>1h</span>
                             <span>12h</span>
                         </div>
@@ -108,15 +99,8 @@ export default function SleepGoalForm({
 
                 <div className="flex gap-3">
                     <button
-                        type="button"
-                        className="flex-1 bg-slate-700 px-4 py-2 rounded-lg text-slate-300 hover:bg-slate-600 transition"
-                        onClick={handleCancel}
-                    >
-                        Cancel
-                    </button>
-                    <button
                         type="submit"
-                        className="flex-1 bg-indigo-600 px-4 py-2 rounded-lg text-white font-medium hover:bg-indigo-500 transition-colors focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-50 disabled:opacity-70 disabled:hover:bg-indigo-600"
+                        className="flex-1 bg-primary px-4 py-2 rounded-lg text-secondary font-medium hover:bg-accent transition-colors focus:ring-2 focus:ring-accent focus:ring-opacity-50 disabled:opacity-70 disabled:hover:bg-primary"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? "Saving..." : "Save Goal"}

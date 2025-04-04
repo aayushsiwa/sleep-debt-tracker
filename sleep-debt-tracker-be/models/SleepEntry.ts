@@ -16,6 +16,7 @@ SleepEntrySchema.pre("save", function (next) {
   next();
 });
 
+// Ensure a user cannot enter the same sleep entry but another user can
 SleepEntrySchema.index({ userId: 1, startTime: 1, endTime: 1 }, { unique: true });
 
 export const SleepEntry = mongoose.model("SleepEntry", SleepEntrySchema);
