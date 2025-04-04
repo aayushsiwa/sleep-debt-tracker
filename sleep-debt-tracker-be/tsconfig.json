@@ -4,11 +4,6 @@
     "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ESNext",
-    "outDir": "./dist",  // Directory where compiled files will be output
-    "skipLibCheck": true  // Optional: Skips type checking of declaration files
-  },
-  "include": [
-    "./*.ts"  // Ensure this matches your source directory structure
-  ]
+    "target": "ESNext"
+  }
 }
