@@ -18,7 +18,7 @@ router.post("/logout",logout)
 router.get("/me", authMiddleware, async (req, res) => {
   try {
       res.json({ authenticated: true, userId: req.userId });
-  } catch (error) {
+  } catch (error) { 
       console.error("Error checking authentication:", error);
       res.status(500).json({ message: "Server error" });
   }

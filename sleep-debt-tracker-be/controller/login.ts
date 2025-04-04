@@ -1,11 +1,13 @@
 import { User } from "../models/User.js";
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+// import "../types/express.d.ts";
 
 dotenv.config();
 
-export const login = async (req, res) => {
+export const login = async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body;
 
@@ -16,15 +18,15 @@ export const login = async (req, res) => {
         }
 
         // Compare password with hashed password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
+        const isPasswordValid = user.password && await bcrypt.compare(password, user.password);
+        if (!isPasswordValid || !user.password) {
             return res.status(401).json({ message: "Invalid password" });
         }
 
         // Create JWT token
         const token = jwt.sign(
             { userId: user.userId, id: user._id },
-            process.env.JWT_SECRET,
+            process.env.JWT_SECRET || "your_jwt_secret",
             { expiresIn: "7d" }
         );
 
@@ -33,7 +35,7 @@ export const login = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
-            sameSite: "Strict"
+            sameSite: "strict",
         });
 
         // Send response with user info
@@ -41,14 +43,13 @@ export const login = async (req, res) => {
             message: "Login successful",
             userId: user.userId,
             id: user._id,
-            token // Optional: including token in response body
+            token, // Optional: including token in response body
         });
-
     } catch (error) {
         console.error("Login error:", error);
-        return res.status(500).json({ 
+        return res.status(500).json({
             message: "An error occurred during login",
-            error: error.message 
+            error: error.message,
         });
     }
 };

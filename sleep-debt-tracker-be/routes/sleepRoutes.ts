@@ -65,7 +65,13 @@ router.get("/user/:userId/debt", async (req: Request, res: Response): Promise<vo
       const validLogs = sleepLogs.filter((log: any) => log.endTime > log.startTime);
       console.log("✅ Valid sleep logs:", validLogs);
 
-      const sleepDebt = calculateSleepDebt(validLogs);
+      const formattedLogs = validLogs.map((log: any) => ({
+          ...log.toObject(),
+          startTime: log.startTime.toString(),
+          endTime: log.endTime.toString(),
+      }));
+
+      const sleepDebt = calculateSleepDebt(formattedLogs);
       res.json({ sleepDebt });
   } catch (error: any) {
       console.error("❌ Error fetching sleep debt:", error);
@@ -96,8 +102,7 @@ router.get("/user/:userId/sleepGoal", async (req: Request, res: Response): Promi
     try {
         const user = await User.findOne({ userId: req.params.userId });
         if (!user) res.status(404).json({ message: "User not found" });
-
-        res.json({ sleepGoal: user.sleepGoal || 480 }); // Default 8 hours (480 mins)
+        res.json({ sleepGoal: user?.sleepGoal || 480 }); // Default 8 hours (480 mins)
     } catch (error: any) {
         console.error("❌ Error fetching sleep goal:", error);
         res.status(500).json({ message: "Error fetching sleep goal" });

@@ -47,16 +47,16 @@ async function connectDB() {
 
         // ✅ Check if collections exist and create them if missing
         const existingCollections = (
-            await mongoose.connection.db.listCollections().toArray()
+            await mongoose.connection.db?.listCollections().toArray() ?? []
         ).map((col) => col.name);
 
         if (!existingCollections.includes("users")) {
-            await mongoose.connection.db.createCollection("users");
+            await mongoose.connection.db?.createCollection("users");
             console.log("📌 Created 'users' collection.");
         }
 
         if (!existingCollections.includes("sleepentries")) {
-            await mongoose.connection.db.createCollection("sleepentries");
+            await mongoose.connection.db?.createCollection("sleepentries");
             console.log("📌 Created 'sleepentries' collection.");
         }
     } catch (error) {

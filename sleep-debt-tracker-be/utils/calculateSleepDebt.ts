@@ -1,31 +1,44 @@
 const DAILY_SLEEP_GOAL = 8 * 60; // 8 hours in minutes
 
-export function calculateSleepDebt(sleepLogs) {
-    const dailySleep = {};
+interface SleepLog {
+  startTime: string;
+  endTime: string;
+}
 
-    sleepLogs.forEach(({ startTime, endTime }) => {
-        let start = new Date(startTime);
-        let end = new Date(endTime);
+interface SleepDebt {
+  [date: string]: number;
+}
 
-        while (start < end) {
-            let currentDay = start.toISOString().split("T")[0]; // YYYY-MM-DD
-            let nextMidnight = new Date(start);
-            nextMidnight.setHours(24, 0, 0, 0);
+interface DailySleep {
+  [date: string]: number;
+}
 
-            let sleepEnd = end < nextMidnight ? end : nextMidnight;
-            let sleepDuration = (Number(sleepEnd) - Number(start)) / (1000 * 60); // ms → minutes
+export function calculateSleepDebt(sleepLogs: SleepLog[]): SleepDebt {
+  const dailySleep: DailySleep = {};
 
-            dailySleep[currentDay] = (dailySleep[currentDay] || 0) + sleepDuration;
+  sleepLogs.forEach(({ startTime, endTime }) => {
+    let start = new Date(startTime);
+    let end = new Date(endTime);
 
-            start = sleepEnd; // Move forward
-        }
-    });
+    while (start < end) {
+      let currentDay = start.toISOString().split("T")[0]; // YYYY-MM-DD
+      let nextMidnight = new Date(start);
+      nextMidnight.setHours(24, 0, 0, 0);
 
-    const sleepDebt = {};
-    Object.keys(dailySleep).forEach((date) => {
-        let actualSleep = dailySleep[date];
-        sleepDebt[date] = Math.max(0, DAILY_SLEEP_GOAL - actualSleep);
-    });
+      let sleepEnd = end < nextMidnight ? end : nextMidnight;
+      let sleepDuration = (Number(sleepEnd) - Number(start)) / (1000 * 60); // ms → minutes
 
-    return sleepDebt;
+      dailySleep[currentDay] = (dailySleep[currentDay] || 0) + sleepDuration;
+
+      start = sleepEnd; // Move forward
+    }
+  });
+
+  const sleepDebt: SleepDebt = {};
+  Object.keys(dailySleep).forEach((date) => {
+    let actualSleep = dailySleep[date];
+    sleepDebt[date] = Math.max(0, DAILY_SLEEP_GOAL - actualSleep);
+  });
+
+  return sleepDebt;
 }
