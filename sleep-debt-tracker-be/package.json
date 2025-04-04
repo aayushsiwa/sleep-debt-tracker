@@ -5,7 +5,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsc",
-        "start": "tsx index.ts",
+        "start": "node dist/server.js",
         "dev": "nodemon -x tsx server.ts"
     },
     "type": "module",
