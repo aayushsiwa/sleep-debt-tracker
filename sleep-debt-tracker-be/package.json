@@ -1,12 +1,12 @@
 {
     "name": "sleep-debt-tracker-be",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "server.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsc",
-        "start": "tsx server.ts",
-        "dev": "nodemon -x tsx server.ts"
+        "start": "node dist/server.js",
+        "dev": "nodemon -x tsx ./server.ts"
     },
     "type": "module",
     "keywords": [],
@@ -20,8 +20,7 @@
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.12.2",
-        "tsc": "^2.0.4"
+        "mongoose": "^8.12.2"
     },
     "devDependencies": {
         "@types/cookie-parser": "^1.4.8",

@@ -1,8 +1,8 @@
 {
-  "builds": [
-    { "src": "package.json", "use": "@vercel/node" }
-  ],
+  "version": 2,
+  "builds": [],
+  "ignoreCommand": "echo 'Skipping build, using prebuilt dist'",
   "routes": [
-    { "src": "/(.*)", "dest": "/server.ts" }
+    { "src": "/(.*)", "dest": "/dist/server.js" }
   ]
 }
