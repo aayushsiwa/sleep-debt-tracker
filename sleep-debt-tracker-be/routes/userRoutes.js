@@ -1,7 +1,4 @@
-// src/routes/userRoutes.ts
 import express from "express";
-import "../types/express.d.ts"; // Import the extended Request type for userId
-// Ensure the custom type declaration is loaded
 import { User } from "../models/User.js";
 import { authMiddleware } from "../middleware/auth.js";
 import { register } from "../controller/auth.js";

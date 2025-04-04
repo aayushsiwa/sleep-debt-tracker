@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import sleepRoutes from "./routes/sleepRoutes.js";
 import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import { User } from "./models/User.js";
 import { SleepEntry } from "./models/SleepEntry.js";
 dotenv.config();
@@ -22,6 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use("", sleepRoutes);
 app.use("", userRoutes);
+app.use(process.env.ADMIN_ROUTE,adminRoutes);
+
 app.get("/", (req, res) => {
     res.send("Welcome to the Sleep Debt Tracker API! 🚀");
 });
